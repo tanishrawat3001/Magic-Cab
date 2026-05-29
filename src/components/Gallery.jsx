@@ -2,23 +2,25 @@ import React from 'react';
 import { Camera, ZoomIn } from 'lucide-react';
 
 export default function Gallery() {
+  const base = import.meta.env.BASE_URL;
   const images = [
     {
-      src: "/images/ertiga_exterior.png",
+      src: `${base}images/ertiga_exterior.png`,
       title: "Jim Corbett - Ramnagar Transit",
       desc: "Our premium white Maruti Ertiga ready for departure."
     },
     {
-      src: "/images/ertiga_interior.png",
+      src: `${base}images/ertiga_interior.png`,
       title: "Spacious Cabin Comfort",
       desc: "Plush leather seats with rear AC vents and charging ports."
     },
     {
-      src: "/images/ertiga_highway.png",
+      src: `${base}images/ertiga_highway.png`,
       title: "Daily Highway Transit",
       desc: "Reliable and smooth travel along the Ramnagar-Delhi highway."
     }
   ];
+
 
   return (
     <section id="gallery" className="py-24 bg-slate-950/30">
