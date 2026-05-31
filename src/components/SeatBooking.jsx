@@ -87,18 +87,16 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
   };
 
   const ramnagarPoints = [
-    `Ramnagar Bus Stand`,
-    `Corbett City Gate / Tiger Reserve`,
-    `Kashipur Bypass`,
-    `Moradabad Road Petrol Pump`
+    `Ramnagar bus stand`,
+    `Peerumadara Bus Stand`,
+    `Kashipur Near Flyover`
   ];
 
   const delhiPoints = [
-    `Kashmiri Gate ISBT, Delhi`,
-    `Anand Vihar Metro Station`,
-    `Connaught Place (CP)`,
-    `IGI Airport Terminal 3`
+    `Noida Sector 62`,
+    `West Vinod Nagar`
   ];
+
 
   const pickupOptions = direction === "outward" ? ramnagarPoints : delhiPoints;
   const dropOptions = direction === "outward" ? delhiPoints : ramnagarPoints;
