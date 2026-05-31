@@ -14,6 +14,7 @@ export default function PaymentUI({ bookingDetails, onClose, onPaymentSuccess })
 
   const {
     date,
+    direction,
     selectedSeats,
     passengerName,
     phoneNumber,
@@ -91,6 +92,7 @@ export default function PaymentUI({ bookingDetails, onClose, onPaymentSuccess })
         phoneNumber,
         seats: selectedSeats,
         date,
+        direction,
         pickup,
         drop,
         baseFare: baseFareTotal,
@@ -140,7 +142,9 @@ export default function PaymentUI({ bookingDetails, onClose, onPaymentSuccess })
             <div className="space-y-4 text-sm text-slate-300">
               <div>
                 <span className="text-xxs text-brand-gray uppercase tracking-wider block font-semibold">Route</span>
-                <span className="font-semibold text-white">Ramnagar to Delhi</span>
+                <span className="font-semibold text-white">
+                  {direction === "outward" ? "Ramnagar to Delhi" : "Delhi to Ramnagar"}
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

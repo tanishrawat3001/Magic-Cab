@@ -39,6 +39,7 @@ export default function TicketConfirmation({ booking, onClose }) {
     phoneNumber,
     seats,
     date,
+    direction,
     pickup,
     drop,
     baseFare,
@@ -55,7 +56,7 @@ export default function TicketConfirmation({ booking, onClose }) {
     `*Passenger:* ${passengerName}%0A` +
     `*Date:* ${date}%0A` +
     `*Seats:* ${seats.map(s => `S${s}`).join(', ')} (${seats.length} Seat/s)%0A` +
-    `*Route:* Ramnagar to Delhi%0A` +
+    `*Route:* ${direction === "outward" ? "Ramnagar to Delhi" : "Delhi to Ramnagar"}%0A` +
     `*Pickup:* ${pickup}%0A` +
     `*Drop:* ${drop}%0A` +
     `*Total Paid:* ₹${total}%0A` +
@@ -89,7 +90,7 @@ export default function TicketConfirmation({ booking, onClose }) {
     
     doc.setTextColor(212, 175, 55); // Gold
     doc.setFontSize(8);
-    doc.text("RAMNAGAR - DELHI DAILY CAB SERVICE", 12, 18);
+    doc.text(direction === "outward" ? "RAMNAGAR - DELHI DAILY CAB SERVICE" : "DELHI - RAMNAGAR DAILY CAB SERVICE", 12, 18);
 
     // Ticket Title Block
     doc.setFillColor(248, 250, 252);
@@ -139,7 +140,7 @@ export default function TicketConfirmation({ booking, onClose }) {
     };
 
     drawGridLine("PASSENGER NAME", passengerName, "MOBILE NUMBER", phoneNumber);
-    drawGridLine("SEATS BOOKED", seats.map(s => `Seat S${s}`).join(', '), "ROUTE", "Ramnagar to Delhi");
+    drawGridLine("SEATS BOOKED", seats.map(s => `Seat S${s}`).join(', '), "ROUTE", direction === "outward" ? "Ramnagar to Delhi" : "Delhi to Ramnagar");
     
     // Address styling (wrapping text)
     doc.setTextColor(100, 116, 139);
@@ -251,7 +252,9 @@ export default function TicketConfirmation({ booking, onClose }) {
               </div>
               <div>
                 <span className="text-xxs text-brand-gray uppercase block font-medium">Route</span>
-                <span className="font-semibold text-white">Ramnagar ➔ Delhi</span>
+                <span className="font-semibold text-white">
+                  {direction === "outward" ? "Ramnagar ➔ Delhi" : "Delhi ➔ Ramnagar"}
+                </span>
               </div>
               <div>
                 <span className="text-xxs text-brand-gray uppercase block font-medium">Seats Selected</span>

@@ -24,6 +24,7 @@ const DEFAULT_BOOKINGS = [
     phoneNumber: "9876543210",
     seats: [3, 4],
     date: new Date().toISOString().split('T')[0], // Today
+    direction: "outward", // Ramnagar -> Delhi
     pickup: "Ramnagar Bus Stand",
     drop: "Anand Vihar Metro",
     baseFare: 1598,
@@ -40,6 +41,7 @@ const DEFAULT_BOOKINGS = [
     phoneNumber: "9898989898",
     seats: [6],
     date: new Date().toISOString().split('T')[0], // Today
+    direction: "return", // Delhi -> Ramnagar
     pickup: "Kashipur Bypass",
     drop: "IGI Airport T3",
     baseFare: 799,
@@ -94,9 +96,9 @@ export const dbService = {
     }
   },
 
-  getBookingsByDate: (date) => {
+  getBookingsByDate: (date, direction) => {
     const bookings = dbService.getBookings();
-    return bookings.filter(b => b.date === date);
+    return bookings.filter(b => b.date === date && (!direction || b.direction === direction));
   },
 
   addBooking: (bookingData) => {
@@ -122,10 +124,10 @@ export const dbService = {
   },
 
   // SEAT OCCUPANCY
-  // Get occupied seats for a specific date
+  // Get occupied seats for a specific date and direction
   // Returns array of seat numbers that are booked
-  getBookedSeats: (date) => {
-    const bookings = dbService.getBookingsByDate(date);
+  getBookedSeats: (date, direction = "outward") => {
+    const bookings = dbService.getBookingsByDate(date, direction);
     let booked = [];
     bookings.forEach(b => {
       booked = [...booked, ...b.seats];
@@ -134,7 +136,7 @@ export const dbService = {
   },
 
   // Admin override to block seats manually
-  blockSeatsManually: (date, seatsToBlock, passengerName = "Blocked by Admin") => {
+  blockSeatsManually: (date, direction, seatsToBlock, passengerName = "Blocked by Admin") => {
     const config = dbService.getConfig();
     const totalFare = config.farePerSeat * seatsToBlock.length;
     const fees = config.convenienceFee * seatsToBlock.length;
@@ -144,6 +146,7 @@ export const dbService = {
       phoneNumber: "N/A",
       seats: seatsToBlock,
       date,
+      direction,
       pickup: "Admin Block",
       drop: "Admin Block",
       baseFare: totalFare,

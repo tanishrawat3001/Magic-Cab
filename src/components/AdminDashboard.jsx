@@ -20,6 +20,7 @@ export default function AdminDashboard({ isOpen, onClose }) {
   const [arrTimeInput, setArrTimeInput] = useState('');
   
   // Manual block seats state
+  const [filterDirection, setFilterDirection] = useState('outward'); // 'outward' or 'return'
   const [blockSeatsInput, setBlockSeatsInput] = useState([]);
   const [blockNameInput, setBlockNameInput] = useState('Manual Admin Block');
 
@@ -98,7 +99,7 @@ export default function AdminDashboard({ isOpen, onClose }) {
       return;
     }
 
-    dbService.blockSeatsManually(filterDate, blockSeatsInput, blockNameInput);
+    dbService.blockSeatsManually(filterDate, filterDirection, blockSeatsInput, blockNameInput);
     setBlockSeatsInput([]);
     setBlockNameInput('Manual Admin Block');
     loadData(); // Reload bookings
@@ -109,9 +110,9 @@ export default function AdminDashboard({ isOpen, onClose }) {
   const totalEarnings = bookings.reduce((sum, b) => sum + (b.paymentId === "ADMIN_BLOCK" ? 0 : b.baseFare + b.fees), 0);
   const totalBookedSeatsCount = bookings.reduce((sum, b) => sum + b.seats.length, 0);
 
-  // Filter bookings by date
-  const filteredBookings = bookings.filter(b => b.date === filterDate);
-  const occupiedSeatsForFilteredDate = dbService.getBookedSeats(filterDate);
+  // Filter bookings by date and direction
+  const filteredBookings = bookings.filter(b => b.date === filterDate && b.direction === filterDirection);
+  const occupiedSeatsForFilteredDate = dbService.getBookedSeats(filterDate, filterDirection);
 
   if (!isOpen) return null;
 
@@ -268,19 +269,32 @@ export default function AdminDashboard({ isOpen, onClose }) {
 
               {/* RIGHT: Calendar Log Filter & Manual Seat Blocks */}
               <div className="lg:col-span-7 glass-panel p-6 rounded-2xl border-slate-800 space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-3">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider">
                     Seat Override Controls
                   </h3>
-                  <input
-                    type="date"
-                    value={filterDate}
-                    onChange={(e) => {
-                      setFilterDate(e.target.value);
-                      setBlockSeatsInput([]); // Reset manual selection
-                    }}
-                    className="bg-slate-950 text-white border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={filterDirection}
+                      onChange={(e) => {
+                        setFilterDirection(e.target.value);
+                        setBlockSeatsInput([]);
+                      }}
+                      className="bg-slate-950 text-white border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                    >
+                      <option value="outward">Ramnagar ➔ Delhi</option>
+                      <option value="return">Delhi ➔ Ramnagar</option>
+                    </select>
+                    <input
+                      type="date"
+                      value={filterDate}
+                      onChange={(e) => {
+                        setFilterDate(e.target.value);
+                        setBlockSeatsInput([]); // Reset manual selection
+                      }}
+                      className="bg-slate-950 text-white border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Seat Map for manual blocking */}
@@ -345,8 +359,10 @@ export default function AdminDashboard({ isOpen, onClose }) {
 
             {/* LOWER LOGS TABLE: Active bookings logs list */}
             <div className="glass-panel p-6 rounded-2xl border-slate-800 space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3 flex justify-between items-center">
-                <span>Bookings Log (Active for Date: {filterDate})</span>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3 flex justify-between items-center flex-wrap gap-2">
+                <span>
+                  Bookings Log ({filterDirection === "outward" ? "Ramnagar ➔ Delhi" : "Delhi ➔ Ramnagar"} on {filterDate})
+                </span>
                 <span className="text-xxs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full font-bold">
                   {filteredBookings.length} Bookings
                 </span>

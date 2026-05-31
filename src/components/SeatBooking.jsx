@@ -4,6 +4,7 @@ import { Calendar, User, Phone, MapPin, ArrowRight } from 'lucide-react';
 export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPayment }) {
   const todayStr = new Date().toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(todayStr);
+  const [direction, setDirection] = useState('outward'); // 'outward' or 'return'
   const [selectedSeats, setSelectedSeats] = useState([]);
   
   // Passenger Form State
@@ -13,7 +14,7 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
   const [drop, setDrop] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
-  const bookedSeats = bookedSeatsByDate(selectedDate);
+  const bookedSeats = bookedSeatsByDate(selectedDate, direction);
 
   // Seat Configuration: 
   // 6 passenger seats (ID 1 to 6)
@@ -44,6 +45,14 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
     setSelectedSeats([]); // Reset selection when date changes
   };
 
+  const handleDirectionChange = (dir) => {
+    setDirection(dir);
+    setSelectedSeats([]); // Reset selection when direction changes
+    setPickup('');
+    setDrop('');
+    setFormErrors({});
+  };
+
   const validateForm = () => {
     const errors = {};
     if (!name.trim()) errors.name = "Name is required";
@@ -66,6 +75,7 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
 
     onContinueToPayment({
       date: selectedDate,
+      direction,
       selectedSeats,
       passengerName: name,
       phoneNumber: mobile,
@@ -76,19 +86,23 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
     });
   };
 
-  const pickupOptions = [
+  const ramnagarPoints = [
     `Ramnagar Bus Stand`,
     `Corbett City Gate / Tiger Reserve`,
     `Kashipur Bypass`,
     `Moradabad Road Petrol Pump`
   ];
 
-  const dropOptions = [
+  const delhiPoints = [
     `Kashmiri Gate ISBT, Delhi`,
     `Anand Vihar Metro Station`,
     `Connaught Place (CP)`,
     `IGI Airport Terminal 3`
   ];
+
+  const pickupOptions = direction === "outward" ? ramnagarPoints : delhiPoints;
+  const dropOptions = direction === "outward" ? delhiPoints : ramnagarPoints;
+
 
   return (
     <section id="book-now" className="py-20 bg-slate-950/40 relative">
@@ -104,19 +118,46 @@ export default function SeatBooking({ config, bookedSeatsByDate, onContinueToPay
           </p>
         </div>
 
-        {/* Date Selector Banner */}
-        <div className="glass-panel max-w-xl mx-auto p-4 rounded-2xl mb-12 flex items-center justify-between border-brand-gold/10">
-          <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
-            <Calendar size={18} className="text-brand-gold" />
-            Travel Date:
-          </label>
-          <input
-            type="date"
-            min={todayStr}
-            value={selectedDate}
-            onChange={handleDateChange}
-            className="bg-slate-900 text-white border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-brand-gold transition-colors font-medium"
-          />
+        {/* Date & Route Selector Banner */}
+        <div className="glass-panel max-w-2xl mx-auto p-5 rounded-2xl mb-12 flex flex-col md:flex-row items-center justify-between gap-6 border-brand-gold/10">
+          <div className="flex items-center justify-between w-full md:w-auto gap-4">
+            <label className="text-sm font-semibold text-slate-350 flex items-center gap-2 whitespace-nowrap">
+              <Calendar size={18} className="text-brand-gold" />
+              Travel Date:
+            </label>
+            <input
+              type="date"
+              min={todayStr}
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="bg-slate-900 text-white border border-slate-700/80 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-brand-gold transition-colors font-medium"
+            />
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end border-t md:border-t-0 border-slate-800/60 pt-4 md:pt-0">
+            <button
+              type="button"
+              onClick={() => handleDirectionChange('outward')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                direction === 'outward'
+                  ? 'bg-gradient-to-r from-brand-gold to-[#B5932F] text-slate-950 border-brand-gold shadow-md'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+              }`}
+            >
+              Ramnagar ➔ Delhi
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDirectionChange('return')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                direction === 'return'
+                  ? 'bg-gradient-to-r from-brand-gold to-[#B5932F] text-slate-950 border-brand-gold shadow-md'
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+              }`}
+            >
+              Delhi ➔ Ramnagar
+            </button>
+          </div>
         </div>
 
         {/* Form & Seat Grid container */}
